@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Matemático</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #question {
+            font-size: 2em;
+        }
+        #answerBox {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        #submitBtn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+        .correct { background-color: #28a745; }
+        .incorrect { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div id="question">Pregunta aquí</div>
+    <input type="number" id="answerBox" placeholder="Escribe tu respuesta">
+    <button id="submitBtn" onclick="checkAnswer()">Enviar</button>
+
+    <div id="feedback"></div>
+    <div id="score">Puntaje: 0</div>
+
+    <script>
+        let correctAnswer;
+        let attempts = 0;
+        let score = 0;
+        let incorrectAttempts = 0;
+        let startTime;
+        
+        function generateQuestion() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const operation = Math.random() < 0.5 ? 'multiply' : 'divide';
+            
+            if (operation === 'multiply') {
+                correctAnswer = num1 * num2;
+                document.getElementById("question").innerText = `¿Cuánto es ${num1} × ${num2}?`;
+            } else {
+                correctAnswer = (num1*num2 / num1);
+                document.getElementById("question").innerText = `¿Cuánto es ${num1*num2} ÷ ${num1}?`;
+            }
+            
+            startTime = Date.now();
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseFloat(document.getElementById("answerBox").value);
+            const elapsedTime = (Date.now() - startTime) / 1000; // tiempo en segundos
+
+            if (userAnswer === correctAnswer) {
+                score += (1 * (1 / elapsedTime));  // Puntaje: + (1 * (1/tiempo))
+                document.body.classList.add("correct");
+                document.body.classList.remove("incorrect");
+                document.getElementById("feedback").innerText = "¡Correcto!";
+                attempts++;
+            } else {
+                incorrectAttempts++;
+                document.body.classList.add("incorrect");
+                document.body.classList.remove("correct");
+                document.getElementById("feedback").innerText = "Incorrecto!";
+                attempts++;
+            }
+
+            // Actualiza el puntaje y el estado
+            document.getElementById("score").innerText = `Puntaje: ${score.toFixed(2)}`;
+            document.getElementById("answerBox").value = "";
+
+            // Verifica si el jugador ha perdido
+            if (incorrectAttempts >= 5) {
+                document.getElementById("feedback").innerText = "¡Perdiste! Has cometido 5 errores.";
+                document.getElementById("submitBtn").disabled = true; // Deshabilita el botón de submit
+            } else {
+                setTimeout(() => {
+                    document.body.classList.remove("correct", "incorrect");
+                    generateQuestion(); // Genera una nueva pregunta
+                }, 1000); // Espera 1 segundo antes de mostrar la nueva pregunta
+            }
+        }
+
+	document.getElementById("answerBox").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        });
+
+        // Inicia el juego
+        generateQuestion();
+    </script>
+</body>
+</html>
